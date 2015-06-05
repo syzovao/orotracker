@@ -1,0 +1,9 @@
+oro:
+    issue:
+        issues: Issues
+
+        menu:
+            issues_tab.label: Issues
+
+        sections:
+            issues: Issues List

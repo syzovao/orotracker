@@ -1,0 +1,13 @@
+oro_menu_config:
+    items:
+        issues_tab:
+            label: 'oro.issue.menu.issues_tab.label'
+            uri: '#'
+            extras:
+                position: 15
+                icon: icon-puzzle-piece
+
+    tree:
+        application_menu:
+            children:
+                issues_tab: ~
