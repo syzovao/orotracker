@@ -1,9 +1,55 @@
 oro:
     issue:
-        issues: Issues
+        label:                Issue
+        issues:               Issues
+        entity_plural_label:  Issues
+        entity_label:         Issue
+        assignee.label:       Assignee
+        create:               Create
+        list_label:           Issues List
+        code.label:           Code
+        summary.label:        Summary
+        description.label:    Description
+        priority.label:       Priority
+        resolution.label:     Resolution
+        assignee.label:       Assignee
+        reporter.label:       Reporter
+        issue_type.label:     Type
+        related_issues.label: Related Issues
+        parent.label:         Parent
+        owner.label:          Owner
+        organization.label:   Organization
+        collaborators.label:  Collaborators
+        created_at.label:     Created At
+        updated_at.label:     Updated At
+        children.label:       Children
+        id.label:             Id
+
+        status.unassigned:    Unassigned
+        tag:
+            entity_plural_label: Tags
+            label:               Tag
 
         menu:
             issues_tab.label: Issues
+            manage_issues.label: Manage Issues
 
         sections:
             issues: Issues List
+
+        issue_type:
+            task:    Task
+            story:   Story
+            subtask: Subtask
+            bug:     Bug
+
+        message:
+            no_collaborators:
+                Collaborators not found.
+
+        controller:
+            issue.saved.message: Issue has been saved
+            issue.deleted.message: Issue was deleted successfully
+
+issue:
+    label: Issue

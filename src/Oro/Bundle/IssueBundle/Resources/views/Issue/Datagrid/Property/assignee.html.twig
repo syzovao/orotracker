@@ -1,0 +1,7 @@
+{% if not (record.getValue('assigneeId')) %}
+    {{ "oro.issue.status.unassigned"|trans }}
+{% elseif resource_granted('oro_user_user_view') %}
+    <a href="{{ path('oro_user_view', {id: record.getValue('assigneeId')}) }}">{{ value }}</a>
+{% else %}
+    {{ value }}
+{% endif %}

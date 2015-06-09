@@ -1,1 +1,13 @@
-Issue index page
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set gridName = 'issues-grid' %}
+{% set pageTitle = 'oro.issue.entity_plural_label'|trans %}
+
+{% block navButtons %}
+    {% if isDesktopVersion() and resource_granted('oro_issue_create') %}
+        {{ UI.addButton({
+            'path':          path('oro_issue_create'),
+            'entity_label': 'oro.issue.entity_label'|trans
+        }) }}
+    {% endif %}
+{% endblock %}

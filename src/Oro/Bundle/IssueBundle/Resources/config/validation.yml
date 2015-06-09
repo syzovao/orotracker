@@ -1,0 +1,28 @@
+Oro\IssueBundle\Entity\Issue:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            { fields: code, message: 'issue.validators.code_in_use' }
+        - Callback:
+            methods: [validateParentIssue]
+
+    properties:
+        code:
+            - NotBlank: ~
+        summary:
+            - NotBlank: ~
+            - Length:
+                max: 255
+        createdAt:
+            - DateTime: ~
+        updatedAt:
+            - DateTime: ~
+        priority:
+            - NotBlank: ~
+        resolution:
+            - NotBlank: ~
+        issueType:
+            - NotBlank: ~
+        reporter:
+            - NotBlank: ~
+        assignee:
+            - NotBlank: ~

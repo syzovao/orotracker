@@ -5,7 +5,13 @@ namespace Oro\Bundle\IssueBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\TagBundle\Entity\Taggable;
+use Oro\Bundle\IssueBundle\Model\ExtendIssue;
+
 
 /**
  * Issue
@@ -13,9 +19,32 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Table(name="oro_issue")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Entity(repositoryClass="Oro\Bundle\IssueBundle\Entity\Repository\IssueRepository")
+ * @Config(
+ *      routeName="oro_issue_index",
+ *      routeView="oro_issue_view",
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-list-alt"
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
+ *          },
+ *          "workflow"={
+ *              "active_workflow"="oro_issue_workflow"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          }
+ *      }
+ * )
  *
  */
-class Issue
+class Issue extends ExtendIssue implements Taggable
 {
     const TYPE_BUG     = 'bug';
     const TYPE_TASK    = 'task';
@@ -53,27 +82,27 @@ class Issue
     protected $description;
 
     /**
+     * @var IssuePriority
+     *
+     * @ORM\ManyToOne(targetEntity="IssuePriority")
+     * @ORM\JoinColumn(name="priority_code", referencedColumnName="code", onDelete="SET NULL")
+     */
+    protected $priority;
+
+    /**
+     * @var IssueResolution
+     *
+     * @ORM\ManyToOne(targetEntity="IssueResolution")
+     * @ORM\JoinColumn(name="resolution_code", referencedColumnName="code", onDelete="SET NULL")
+     */
+    protected $resolution;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="issue_type", type="string", length=255)
      */
     protected $issueType;
-
-    /**
-     * @var IssuePriority
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IssueBundle\Entity\IssuePriority")
-     * @ORM\JoinColumn(name="issue_priority_code", referencedColumnName="code", onDelete="SET NULL")
-     */
-    protected $issuePriority;
-
-    /**
-     * @var IssueResolution
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IssueBundle\Entity\IssueResolution")
-     * @ORM\JoinColumn(name="issue_resolution_code", referencedColumnName="code", onDelete="SET NULL")
-     */
-    protected $issueResolution;
 
     /**
      * @var User
@@ -118,14 +147,14 @@ class Issue
      *
      * @ORM\ManyToOne(targetEntity="Issue", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
-     **/
+     */
     protected $parent;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection Issue[]
      *
      * @ORM\OneToMany(targetEntity="Issue", mappedBy="parent")
-     **/
+     */
     protected $children;
 
     /**
@@ -141,6 +170,27 @@ class Issue
      * @ORM\Column(name="updatedAt", type="datetime")
      */
     protected $updatedAt;
+
+    /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $owner;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
+    /**
+     * @var ArrayCollection $tags
+     */
+    protected $tags;
 
     /**
      * Constructor
@@ -184,6 +234,16 @@ class Issue
     public function getCode()
     {
         return $this->code;
+    }
+
+    /**
+     * Get label
+     *
+     * @return string
+     */
+    public function getLabel()
+    {
+        return (string) $this->code;
     }
 
     /**
@@ -372,11 +432,6 @@ class Issue
         return $this->parent;
     }
 
-    function getFullParent()
-    {
-        return sprintf('%s - %s', $this->code, $this->issueType);
-    }
-
     /**
      * Set children
      *
@@ -475,13 +530,13 @@ class Issue
     /**
      * Set IssuePriority
      *
-     * @param IssuePriority $issuePriority
+     * @param IssuePriority $priority
      *
      * @return Issue
      */
-    public function setIssuePriority($issuePriority)
+    public function setPriority($priority)
     {
-        $this->issuePriority = $issuePriority;
+        $this->priority = $priority;
 
         return $this;
     }
@@ -491,21 +546,21 @@ class Issue
      *
      * @return IssuePriority
      */
-    public function getIssuePriority()
+    public function getPriority()
     {
-        return $this->issuePriority;
+        return $this->priority;
     }
 
     /**
      * Set IssueResolution
      *
-     * @param IssueResolution $issueResolution
+     * @param IssueResolution $resolution
      *
      * @return IssueResolution
      */
-    public function setIssueResolution($issueResolution)
+    public function setResolution($resolution)
     {
-        $this->issueResolution = $issueResolution;
+        $this->resolution = $resolution;
 
         return $this;
     }
@@ -515,9 +570,9 @@ class Issue
      *
      * @return IssueResolution
      */
-    public function getIssueResolution()
+    public function getResolution()
     {
-        return $this->issueResolution;
+        return $this->resolution;
     }
 
     /**
@@ -531,30 +586,6 @@ class Issue
     }
 
     /**
-     * Add children
-     *
-     * @param Issue $children
-     *
-     * @return Issue
-     */
-    public function addChild(Issue $children)
-    {
-        $this->children[] = $children;
-
-        return $this;
-    }
-
-    /**
-     * Remove children
-     *
-     * @param Issue $children
-     */
-    public function removeChild(Issue $children)
-    {
-        $this->children->removeElement($children);
-    }
-
-    /**
      * Get string value
      *
      * @return string
@@ -562,5 +593,95 @@ class Issue
     public function __toString()
     {
         return (string) $this->code;
+    }
+
+    /**
+     * Get relatedIssues
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getRelatedIssues()
+    {
+        return $this->relatedIssues;
+    }
+
+    /**
+     * Set owner
+     *
+     * @param User $owner
+     *
+     * @return Issue
+     */
+    public function setOwner(User $owner = null)
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * Get owner
+     *
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     *
+     * @return Issue
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * Get TaggableId
+     *
+     * @return int
+     */
+    public function getTaggableId()
+    {
+        return $this->getId();
+    }
+
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTags()
+    {
+        $this->tags = $this->tags ? : new ArrayCollection();
+
+        return $this->tags;
+    }
+
+    /**
+     * @param ArrayCollection $tags
+     * @return Issue $this
+     */
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+
+        return $this;
     }
 }

@@ -7,7 +7,38 @@ oro_menu_config:
                 position: 15
                 icon: icon-puzzle-piece
 
+        issues_divider:
+            label: ''
+            extras:
+                position: 100
+            attributes:
+                class: 'divider'
+
+        manage_issues:
+            label: 'oro.issue.menu.manage_issues.label'
+            route: 'oro_issue_index'
+            extras:
+                position: 105
+                routes: ['oro_issue_index', 'oro_issue_update', 'oro_issue_create', 'oro_issue_view']
+            attributes:
+                class: 'mobile-hide'
+
     tree:
         application_menu:
             children:
-                issues_tab: ~
+                issues_tab:
+                    children:
+                        issues_divider: ~
+                        manage_issues: ~
+
+oro_titles:
+    oro_issue_index:  ~
+    oro_issue_view:   '%%issue.label%% - %%issue.summary%%'
+    oro_issue_create: 'Create issue'
+    oro_issue_update: '%%issue.label%% - Edit'
+
+oro_navigation_elements:
+    pinButton:
+        routes:
+            oro_issue_create: false
+            oro_issue_update: false

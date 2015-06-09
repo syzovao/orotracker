@@ -48,9 +48,11 @@ class OroIssueBundleInstaller implements Installation
         $table = $schema->createTable('oro_issue');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('assignee_id', 'integer', ['notnull' => false]);
-        $table->addColumn('issue_priority_code', 'string', ['notnull' => false, 'length' => 50]);
+        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('priority_code', 'string', ['notnull' => false, 'length' => 50]);
         $table->addColumn('parent_id', 'integer', ['notnull' => false]);
-        $table->addColumn('issue_resolution_code', 'string', ['notnull' => false, 'length' => 50]);
+        $table->addColumn('resolution_code', 'string', ['notnull' => false, 'length' => 50]);
         $table->addColumn('reporter_id', 'integer', ['notnull' => false]);
         $table->addColumn('code', 'string', ['length' => 20]);
         $table->addColumn('summary', 'string', ['length' => 255]);
@@ -59,11 +61,13 @@ class OroIssueBundleInstaller implements Installation
         $table->addColumn('createdAt', 'datetime', []);
         $table->addColumn('updatedAt', 'datetime', []);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['issue_priority_code']);
-        $table->addIndex(['issue_resolution_code']);
+        $table->addIndex(['priority_code']);
+        $table->addIndex(['resolution_code']);
         $table->addIndex(['reporter_id']);
         $table->addIndex(['assignee_id']);
         $table->addIndex(['parent_id']);
+        $table->addIndex(['organization_id']);
+        $table->addIndex(['user_owner_id']);
     }
 
     /**
@@ -140,7 +144,7 @@ class OroIssueBundleInstaller implements Installation
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_issue_priority'),
-            ['issue_priority_code'],
+            ['priority_code'],
             ['code'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
@@ -152,13 +156,25 @@ class OroIssueBundleInstaller implements Installation
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_issue_resolution'),
-            ['issue_resolution_code'],
+            ['resolution_code'],
             ['code'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['reporter_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_owner_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
