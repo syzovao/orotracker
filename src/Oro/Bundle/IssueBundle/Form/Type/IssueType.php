@@ -20,39 +20,34 @@ class IssueType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add(
-                'code',
-                'text',
+            ->add('code', 'text',
                 array(
                     'required' => true,
                     'label' => 'oro.issue.code.label',
                     'constraints' => array(
                         new NotBlank()
-                    )
+                    ),
+                    'attr' => array('class'=>'taggable-field')
                 )
             )
-            ->add(
-                'summary',
-                'text',
+            ->add('summary', 'text',
                 array(
                     'required' => true,
                     'label' => 'oro.issue.summary.label',
                     'constraints' => array(
                         new NotBlank()
-                    )
+                    ),
+                    'attr' => array('class'=>'taggable-field')
                 )
             )
-            ->add(
-                'description',
-                'textarea',
+            ->add('description', 'textarea',
                 array(
                     'required' => false,
-                    'label' => 'oro.issue.description.label'
+                    'label' => 'oro.issue.description.label',
+                    'attr' => array('class'=>'taggable-field')
                 )
             )
-            ->add(
-                'issueType',
-                'choice',
+            ->add('issueType', 'choice',
                 array(
                     'label' => 'oro.issue.issue_type.label',
                     'choices' => array(
@@ -64,9 +59,7 @@ class IssueType extends AbstractType
                     'required' => true
                 )
             )
-            ->add(
-                'priority',
-                'entity',
+            ->add('priority', 'entity',
                 array(
                     'label'    => 'oro.issue.priority.label',
                     'class' => 'Oro\Bundle\IssueBundle\Entity\IssuePriority',
@@ -77,12 +70,10 @@ class IssueType extends AbstractType
                     },
                     'property' => 'label',
                     'property_path' => 'priority',
-                    'attr' => array('class'=>'form-control')
+                    'attr' => array('class'=>'form-control'),
                 )
             )
-            ->add(
-                'resolution',
-                'entity',
+            ->add('resolution', 'entity',
                 array(
                     'label'    => 'oro.issue.resolution.label',
                     'class'    => 'Oro\Bundle\IssueBundle\Entity\IssueResolution',
@@ -92,24 +83,26 @@ class IssueType extends AbstractType
                         },
                     'property' => 'label',
                     'property_path' => 'resolution',
-                    'attr' => array('class'=>'form-control')
+                    'attr' => array('class'=>'form-control'),
                 )
             )
-            ->add(
-                'assignee',
-                'oro_user_select',
+            ->add('assignee', 'oro_user_select',
                 array(
                     'label'    => 'oro.issue.assignee.label',
-                    'attr' => array('class'=>'form-control')
+                    'attr' => array('class'=>'form-control'),
                 )
             );
-
-        // tags
-        $builder->add(
-            'tags',
-            'oro_tag_select',
+        $builder->add('parent', 'entity',
             array(
-                'label' => 'oro.tag.entity_plural_label'
+                'required' => false,
+                'class' => 'Oro\Bundle\IssueBundle\Entity\Issue',
+                'label' => 'oro.issue.code',
+                'property' => 'label',
+            )
+        );
+        $builder->add('tags', 'oro_tag_select',
+            array(
+                'label' => 'oro.tag.entity_plural_label',
             )
         );
     }

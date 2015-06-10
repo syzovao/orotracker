@@ -1,7 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroTagBundle:Form:fields.html.twig'] %}
-{% oro_title_set({params : {"%entity.summary%": entity.summary, "%entityName%": 'oro.issue.entity_label'|trans }}) %}
+{% oro_title_set({params : {"%entity.code%": entity.code} }) %}
 
 {% set entityId = entity.id %}
 {% set formAction = entityId ? path('oro_issue_update', { 'id': entityId}) : path('oro_issue_create') %}

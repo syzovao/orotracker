@@ -33,9 +33,9 @@ oro_menu_config:
 
 oro_titles:
     oro_issue_index:  ~
-    oro_issue_view:   '%%issue.label%% - %%issue.summary%%'
+    oro_issue_view:   '%%entity.code%%'
     oro_issue_create: 'Create issue'
-    oro_issue_update: '%%issue.label%% - Edit'
+    oro_issue_update: '%%entity.code%% - Edit'
 
 oro_navigation_elements:
     pinButton:

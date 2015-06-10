@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Symfony\Component\Validator\ExecutionContextInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -381,16 +382,6 @@ class Issue extends ExtendIssue implements Taggable
     }
 
     /**
-     * Remove collaborators
-     *
-     * @param User $user
-     */
-    public function removeCollaborator(User $user)
-    {
-        $this->collaborators->removeElement($user);
-    }
-
-    /**
      * @ORM\PrePersist
      */
     public function beforePersist()
@@ -676,6 +667,7 @@ class Issue extends ExtendIssue implements Taggable
 
     /**
      * @param ArrayCollection $tags
+     *
      * @return Issue $this
      */
     public function setTags($tags)
@@ -683,5 +675,27 @@ class Issue extends ExtendIssue implements Taggable
         $this->tags = $tags;
 
         return $this;
+    }
+
+    /**
+     * Validate not empty parent for sub-task
+     *
+     * @param ExecutionContextInterface $context
+     */
+    public function validateParentIssue(ExecutionContextInterface $context)
+    {
+        $type = $this->getIssueType();
+        $parent = $this->getParent();
+        if ($type->getCode() == self::TYPE_SUBTASK) {
+            if (empty($parent)) {
+                $context->addViolationAt('parent', 'issue.validators.parent_empty');
+            } elseif ($this->getId() == $parent->getId()) {
+                $context->addViolationAt('parent', 'issue.validators.parent_the_same');
+            }
+        } else {
+            if (!empty($parent)) {
+                $context->addViolationAt('parent', 'issue.validators.parent_only_for_subtask');
+            }
+        }
     }
 }

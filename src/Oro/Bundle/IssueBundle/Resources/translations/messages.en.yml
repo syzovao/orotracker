@@ -26,9 +26,6 @@ oro:
         id.label:             Id
 
         status.unassigned:    Unassigned
-        tag:
-            entity_plural_label: Tags
-            label:               Tag
 
         menu:
             issues_tab.label: Issues
