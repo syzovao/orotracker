@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IssueBundle\Form\Handler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,19 +19,18 @@ class IssueHandler implements TagHandlerInterface
     /** @var Request */
     protected $request;
 
-    /** @var EntityManager */
+    /** @var ObjectManager */
     protected $manager;
 
     /** @var TagManager */
     protected $tagManager;
 
-
     /**
      * @param FormInterface $form
      * @param Request       $request
-     * @param EntityManager $manager
+     * @param ObjectManager $manager
      */
-    public function __construct(FormInterface $form, Request $request, EntityManager $manager)
+    public function __construct(FormInterface $form, Request $request, ObjectManager $manager)
     {
         $this->form    = $form;
         $this->request = $request;

@@ -6,7 +6,10 @@ use Symfony\Component\DomCrawler\Form;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-
+/**
+ * @outputBuffering enabled
+ * @dbIsolation
+ */
 class IssueControllerTest extends WebTestCase
 {
     const ISSUE_CODE = 'TEST_ISSUE_1';
