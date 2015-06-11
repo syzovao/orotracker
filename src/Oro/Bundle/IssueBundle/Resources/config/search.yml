@@ -4,7 +4,7 @@ Oro\Bundle\IssueBundle\Entity\Issue:
     route:
         name:                       oro_issue_view
         parameters:
-            id:                     issue.id
+            id:                     id
     search_template:                OroIssueBundle:Search:result.html.twig
     fields:
         -

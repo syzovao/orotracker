@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 /**
  * @outputBuffering enabled
  * @dbIsolation
+ * @dbReindex
  */
 class IssueControllerTest extends WebTestCase
 {
@@ -46,7 +47,7 @@ class IssueControllerTest extends WebTestCase
         $form = $crawler->selectButton('Save and Close')->form();
         $form->setValues(array(
             'oro_issue_form_issue[code]' => self::ISSUE_CODE,
-            'oro_issue_form_issue[summary]' => self::ISSUE_DESCRIPTION,
+            'oro_issue_form_issue[summary]' => self::ISSUE_SUMMARY,
             'oro_issue_form_issue[description]' => self::ISSUE_DESCRIPTION,
             'oro_issue_form_issue[issueType]' => 'task',
             'oro_issue_form_issue[priority]' => 'trivial',
@@ -108,7 +109,6 @@ class IssueControllerTest extends WebTestCase
      */
     public function testView($id)
     {
-
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_issue_view', array('id' => $id))
@@ -133,4 +133,43 @@ class IssueControllerTest extends WebTestCase
         return $this->userId;
     }
 
+    public function testGridData()
+    {
+        $response = $this->client->requestGrid(
+            'issues-grid',
+            array('issues-grid[_filter][code][value]' => 'TEST_ISSUE_1_Updated')
+        );
+
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+
+        $response = $this->client->requestGrid(
+            'issues-grid',
+            array(
+                'issues-grid[_filter][summary][value]' => self::ISSUE_SUMMARY
+            )
+        );
+
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+
+        $this->assertEquals(self::ISSUE_SUMMARY, $result['summary']);
+    }
+
+    public function testSearchData()
+    {
+        $searchStr = self::ISSUE_CODE;
+        $this->client->request('GET',
+            $this->getUrl('oro_search_results',
+                array(
+                    'from' => 'oro_issue',
+                    'search' => $searchStr
+                )
+            )
+        );
+        $result = $this->client->getResponse();
+
+        $this->assertContains($searchStr, $result->getContent());
+        $this->assertContains('Search results', $result->getContent());
+    }
 }
