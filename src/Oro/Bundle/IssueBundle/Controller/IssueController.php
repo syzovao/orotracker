@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IssueBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -67,6 +68,23 @@ class IssueController extends Controller
                 ->setReporter($user);
         } elseif ($reporter = $this->getUser()) {
             $entity->setReporter($reporter);
+        }
+
+        //init parent issue
+        $parent = $this->getRequest()->get('parent');
+        if ($parent > 0) {
+            /** @var \Oro\Bundle\IssueBundle\Entity\Repository\IssueRepository $repository */
+            $repository = $this->getDoctrine()->getRepository('OroIssueBundle:Issue');
+            /** @var Issue $parentIssue */
+            $parentIssue = $repository->findParentStory($parent);
+            if (!empty($parentIssue)) {
+                $entity->setIssueType(Issue::TYPE_SUBTASK);
+                $entity->setParent($parentIssue);
+            } else {
+                throw new AccessDeniedException(
+                    $this->get('translator')->trans('oro.issue.controller.issue.incorrect_parent')
+                );
+            }
         }
 
         $issuePriority = $this->getDoctrine()

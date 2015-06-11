@@ -6,6 +6,8 @@ oro:
         entity_label:         Issue
         assignee.label:       Assignee
         create:               Create
+        subtask_label:        Sub-task
+        subtask_plural_label: Sub-tasks
         list_label:           Issues List
         code.label:           Code
         summary.label:        Summary
@@ -45,6 +47,7 @@ oro:
                 Collaborators not found.
 
         controller:
+            issue.incorrect_parent: Only "Story" issues can have a Sub-tasks
             issue.saved.message: Issue has been saved
             issue.deleted.message: Issue was deleted successfully
 

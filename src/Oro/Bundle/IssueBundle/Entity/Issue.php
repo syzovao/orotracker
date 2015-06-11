@@ -481,6 +481,7 @@ class Issue extends ExtendIssue implements Taggable
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -684,9 +685,8 @@ class Issue extends ExtendIssue implements Taggable
      */
     public function validateParentIssue(ExecutionContextInterface $context)
     {
-        $type = $this->getIssueType();
         $parent = $this->getParent();
-        if ($type->getCode() == self::TYPE_SUBTASK) {
+        if ($this->getIssueType() == self::TYPE_SUBTASK) {
             if (empty($parent)) {
                 $context->addViolationAt('parent', 'issue.validators.parent_empty');
             } elseif ($this->getId() == $parent->getId()) {

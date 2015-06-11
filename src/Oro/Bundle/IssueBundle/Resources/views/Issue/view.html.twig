@@ -4,6 +4,12 @@
 
 {% oro_title_set({params : {"%entity.code%": entity.code} }) %}
 {% block navButtons %}
+    {% if isDesktopVersion() and resource_granted('oro_issue_create') and (entity.issueType == 'story') %}
+        {{ UI.addButton({
+            'path' : path('oro_issue_create', { 'parent': entity.id }),
+            'entity_label': 'oro.issue.subtask_label'|trans
+        }) }}
+    {% endif %}
     {% if resource_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path' : path('oro_issue_update', { id: entity.id }),
@@ -27,7 +33,7 @@
     'entity': entity,
     'indexPath': path('oro_issue_index'),
     'indexLabel': 'oro.issue.entity_plural_label'|trans,
-    'entityTitle': entity.summary
+    'entityTitle': entity.code
     } %}
     {{ parent() }}
 {% endblock pageHeader %}
@@ -36,10 +42,29 @@
     {%- set issueInformation -%}
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
+            {% if entity.getParent %}
+                {%- set urlParent -%}
+                <a href="{{ path('oro_issue_view', { 'id': entity.getParent.id }) }}">
+                    {{ entity.getParent.code}}
+                </a>
+                {%- endset -%}
+                {{ UI.renderHtmlProperty('oro.issue.parent.label'|trans, urlParent) }}
+            {% endif %}
             {{ UI.renderProperty('oro.issue.summary.label'|trans, entity.summary) }}
             {{ UI.renderProperty('oro.issue.code.label'|trans, entity.code) }}
             {{ UI.renderHtmlProperty('oro.issue.description.label'|trans, entity.description|nl2br) }}
         </div>
+        {% if entity.hasChildren %}
+            <div class="responsive-block">
+                <p><strong>{{ 'oro.issue.subtask_plural_label'|trans }}</strong></p>
+                {% for subtask in entity.children %}
+                    <ul class="list-unstyled">
+                        <a href="{{ path('oro_issue_view', { 'id': subtask.id }) }}">{{ subtask.code}}: {{ subtask.summary}}</a>
+                    </ul>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     </div>
     {%- endset -%}
 
@@ -65,14 +90,14 @@
 
 
     {% set dataBlocks = [
-    {
-    'title': 'General Information'|trans,
-    'class': 'active',
-    'subblocks': [
-    {'data' : [issueInformation]},
-    {'data' : [collaboratorsBlock]},
-    ]
-    }
+        {
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [issueInformation]},
+                {'data' : [collaboratorsBlock]},
+            ]
+        }
     ] %}
 
     {% set id = 'issueView' %}
