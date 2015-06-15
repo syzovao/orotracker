@@ -19,3 +19,75 @@ Oro\Bundle\IssueBundle\Entity\Issue:
             name:                   summary
             target_type:            text
             target_fields:          [summary]
+        -
+            name:                   createdAt
+            target_type:            datetime
+            target_fields:          [createdAt]
+        -
+            name:                   updatedAt
+            target_type:            datetime
+            target_fields:          [updatedAt]
+        -
+            name:              reporter
+            relation_type:     many-to-one
+            relation_fields:
+                -
+                    name:                  id
+                    target_type:           integer
+                    target_fields:         [username]
+                -
+                    name:                   username
+                    target_type:            text
+                    target_fields:          [username]
+                -
+                    name:                   email
+                    target_type:            text
+                    target_fields:          [email]
+                -
+                    name:                   namePrefix
+                    target_type:            text
+                    target_fields:          [namePrefix]
+                -
+                    name:                   firstName
+                    target_type:            text
+                    target_fields:          [firstName]
+                -
+                    name:                   middleName
+                    target_type:            text
+                    target_fields:          [middleName]
+                -
+                    name:                   lastName
+                    target_type:            text
+                    target_fields:          [lastName]
+        -
+            name:              assignee
+            relation_type:     many-to-one
+            relation_fields:
+                -
+                    name:                   id
+                    target_type:            integer
+                    target_fields:          [username]
+                -
+                    name:                   username
+                    target_type:            text
+                    target_fields:          [username]
+                -
+                    name:                   email
+                    target_type:            text
+                    target_fields:          [email]
+                -
+                    name:                   namePrefix
+                    target_type:            text
+                    target_fields:          [namePrefix]
+                -
+                    name:                   firstName
+                    target_type:            text
+                    target_fields:          [firstName]
+                -
+                    name:                   middleName
+                    target_type:            text
+                    target_fields:          [middleName]
+                -
+                    name:                   lastName
+                    target_type:            text
+                    target_fields:          [lastName]

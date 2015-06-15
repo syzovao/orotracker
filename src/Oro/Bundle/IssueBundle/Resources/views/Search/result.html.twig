@@ -7,8 +7,16 @@
 
 {% set showImage = false %}
 
-{% set recordUrl = indexer_item.recordUrl %}
-{% set title = indexer_item.recordTitle %}
-{#{% set title = entity ? entity.summary : indexer_item.recordTitle %}#}
+{% if entity %}
+    {% set recordUrl = indexer_item.recordUrl %}
+    {% set entityInfo = [
+    {'title': 'oro.ui.created_at'|trans, 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},
+    {'title': 'oro.ui.updated_at'|trans, 'value': entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'},
+    ] %}
+{% endif %}
 
-{% set entityType = 'oro.issue.entity_label'|trans %}
+{% set title = entity.code|default('N/A') %}
+{% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}
+
+
+
