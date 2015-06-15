@@ -9,9 +9,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Oro\Bundle\IssueBundle\Entity\Issue;
 
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\ExecutionContext;
+
 
 class IssueType extends AbstractType
 {
+    const INVALID_PARENT_SUBTASK_MESSAGE = 'issue.validators.parent_only_for_subtask';
 
     /**
      * @param FormBuilderInterface $builder
@@ -44,11 +49,15 @@ class IssueType extends AbstractType
                 array(
                     'required' => false,
                     'label' => 'oro.issue.description.label',
+                    'constraints' => array(
+                        new NotBlank()
+                    ),
                     'attr' => array('class'=>'taggable-field')
                 )
             )
             ->add('issueType', 'choice',
                 array(
+                    'required' => true,
                     'label' => 'oro.issue.issue_type.label',
                     'choices' => array(
                         Issue::TYPE_TASK    => 'oro.issue.issue_type.task',
@@ -56,7 +65,7 @@ class IssueType extends AbstractType
                         Issue::TYPE_SUBTASK => 'oro.issue.issue_type.subtask',
                         Issue::TYPE_BUG     => 'oro.issue.issue_type.bug'
                     ),
-                    'required' => true
+                    'attr' => array('class'=>'form-control')
                 )
             )
             ->add('priority', 'entity',
@@ -97,6 +106,9 @@ class IssueType extends AbstractType
                 'label' => 'oro.tag.entity_plural_label',
             )
         );
+
+        // @todo: remove after fix validation
+        //$builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSetData']);
     }
 
     /**
@@ -107,6 +119,52 @@ class IssueType extends AbstractType
         $resolver->setDefaults(
             array(
                 'data_class' => 'Oro\Bundle\IssueBundle\Entity\Issue'
+            )
+        );
+    }
+
+    /**
+     * POST_SET_DATA event handler
+     *
+     * @param FormEvent $event
+     * @todo: remove after fix validation
+     */
+    public function postSetData(FormEvent $event)
+    {
+        $form = $event->getForm();
+        $data = $event->getData();
+        $constraints = array(
+            new Assert\NotBlank()
+        );
+
+        if ($data instanceof Issue) {
+            $parent = $data->getParent();
+            if ($parent instanceof Issue && $parent->getIssueType() == Issue::TYPE_STORY) {
+                /**
+                 * @param string $value
+                 * @param ExecutionContext $context
+                 */
+                $callback = function ($value, ExecutionContext $context) {
+                    if ($value != Issue::TYPE_SUBTASK) {
+                        $context->addViolation(self::INVALID_PARENT_SUBTASK_MESSAGE, ['{{ value }}' => $value]);
+                    }
+                };
+                $constraints[] = new Assert\Callback(array($callback));
+            }
+        }
+
+        $form->add('issueType', 'choice',
+            array(
+                'label' => 'oro.issue.issue_type.label',
+                'constraints' => $constraints,
+                'choices' => array(
+                    Issue::TYPE_TASK    => 'oro.issue.issue_type.task',
+                    Issue::TYPE_STORY   => 'oro.issue.issue_type.story',
+                    Issue::TYPE_SUBTASK => 'oro.issue.issue_type.subtask',
+                    Issue::TYPE_BUG     => 'oro.issue.issue_type.bug'
+                ),
+                'required' => true,
+                'attr' => array('class'=>'form-control')
             )
         );
     }

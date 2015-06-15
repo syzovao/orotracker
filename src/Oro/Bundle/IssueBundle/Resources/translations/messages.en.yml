@@ -17,6 +17,7 @@ oro:
         assignee.label:       Assignee
         reporter.label:       Reporter
         issue_type.label:     Type
+        issue_status.label:   Status
         related_issues.label: Related Issues
         parent.label:         Parent
         owner.label:          Owner

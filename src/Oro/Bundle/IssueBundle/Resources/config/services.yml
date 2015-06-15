@@ -1,7 +1,9 @@
 parameters:
     oro_issue.issue.entity.class: Oro\Bundle\IssueBundle\Entity\Issue
+    oro_issue.validator.issue_parent_validator.class: Oro\Bundle\IssueBundle\Validator\Constraints\IssueParentValidator
 
 services:
-#    oro_issue.example:
-#        class: %oro_issue.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    oro_issue.validator.issue_parent_validator:
+        class: %oro_issue.validator.issue_parent_validator.class%
+        tags:
+            - { name: validator.constraint_validator, alias: oro_issue.issue_parent_validator }

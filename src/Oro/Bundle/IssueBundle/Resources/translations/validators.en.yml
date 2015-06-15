@@ -3,4 +3,4 @@ issue:
         code_in_use: 'This code is already in use.'
         parent_empty: 'Please, set parent issue for sub-task.'
         parent_the_same: "The same Issue can't be set as parent."
-        parent_only_for_subtask: 'You could set parent issue only for sub-task. Please, leave parent field blank'
+        parent_only_for_subtask: 'Child issue for story could should have sub-task type. Please, use sub-task for type field.'

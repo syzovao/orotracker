@@ -4,14 +4,16 @@ namespace Oro\Bundle\IssueBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Symfony\Component\Validator\ExecutionContextInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\IssueBundle\Model\ExtendIssue;
+
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 
 /**
@@ -43,6 +45,11 @@ use Oro\Bundle\IssueBundle\Model\ExtendIssue;
  *          }
  *      }
  * )
+ *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  *
  */
 class Issue extends ExtendIssue implements Taggable
@@ -192,6 +199,22 @@ class Issue extends ExtendIssue implements Taggable
      * @var ArrayCollection $tags
      */
     protected $tags;
+
+    /**
+     * @var WorkflowItem
+     *
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\WorkflowBundle\Entity\WorkflowItem")
+     * @ORM\JoinColumn(name="workflowItem_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $workflowIssueItem;
+
+    /**
+     * @var WorkflowStep
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\WorkflowBundle\Entity\WorkflowStep")
+     * @ORM\JoinColumn(name="workflowStep_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $workflowIssueStep;
 
     /**
      * Constructor
@@ -679,23 +702,40 @@ class Issue extends ExtendIssue implements Taggable
     }
 
     /**
-     * Validate not empty parent for sub-task
-     *
-     * @param ExecutionContextInterface $context
+     * @param WorkflowItem $workflowItem
+     * @return Issue
      */
-    public function validateParentIssue(ExecutionContextInterface $context)
+    public function setWorkflowItem($workflowItem)
     {
-        $parent = $this->getParent();
-        if ($this->getIssueType() == self::TYPE_SUBTASK) {
-            if (empty($parent)) {
-                $context->addViolationAt('parent', 'issue.validators.parent_empty');
-            } elseif ($this->getId() == $parent->getId()) {
-                $context->addViolationAt('parent', 'issue.validators.parent_the_same');
-            }
-        } else {
-            if (!empty($parent)) {
-                $context->addViolationAt('parent', 'issue.validators.parent_only_for_subtask');
-            }
-        }
+        $this->workflowIssueItem = $workflowItem;
+
+        return $this;
+    }
+
+    /**
+     * @return WorkflowItem
+     */
+    public function getWorkflowItem()
+    {
+        return $this->workflowIssueItem;
+    }
+
+    /**
+     * @param WorkflowItem $workflowStep
+     * @return Issue
+     */
+    public function setWorkflowStep($workflowStep)
+    {
+        $this->workflowIssueStep = $workflowStep;
+
+        return $this;
+    }
+
+    /**
+     * @return WorkflowStep
+     */
+    public function getWorkflowStep()
+    {
+        return $this->workflowIssueStep;
     }
 }
