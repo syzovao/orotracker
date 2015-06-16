@@ -2,8 +2,12 @@ workflows:
     oro_issue_workflow:
         label: "Issue Processing Flow"
         entity: Oro\Bundle\IssueBundle\Entity\Issue
+        entity_attribute: issue
         start_step: open
         steps_display_ordered: true
+        attributes:
+            resolution:
+                property_path: issue.resolution
         steps:
             open:
                 label: 'Open'
@@ -50,6 +54,13 @@ workflows:
                 frontend_options:
                     icon: 'icon-ok'
                 transition_definition: resolve_definition
+                form_options:
+                    attribute_fields:
+                        resolution:
+                            options:
+                                required: true
+                                constraints:
+                                    - NotBlank: ~
             close:
                 label: 'Close'
                 step_to: closed
