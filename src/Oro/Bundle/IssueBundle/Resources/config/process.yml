@@ -1,0 +1,23 @@
+definitions:
+    oro_issue_note_definition:
+        label: "Issue Note Definition"
+        enabled: true
+        entity: Oro\Bundle\NoteBundle\Entity\Note
+        actions_configuration:
+            - @call_method:
+                parameters:
+                    method: get_class
+                    method_parameters: [$target]
+                    attribute: $.targetClass
+            - @call_method:
+                conditions:
+                    @equal: [$.targetClass, 'Oro\Bundle\IssueBundle\Entity\Issue']
+                parameters:
+                    object: $target
+                    method: addCollaborator
+                    method_parameters: [$owner]
+triggers:
+    oro_issue_note_definition:
+        -
+            event: create
+

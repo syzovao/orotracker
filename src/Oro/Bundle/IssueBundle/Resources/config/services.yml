@@ -1,9 +1,24 @@
 parameters:
     oro_issue.issue.entity.class: Oro\Bundle\IssueBundle\Entity\Issue
     oro_issue.validator.issue_parent_validator.class: Oro\Bundle\IssueBundle\Validator\Constraints\IssueParentValidator
+    oro_issue.issue_listener.class: Oro\Bundle\IssueBundle\EventListener\IssueListener
+    oro_issue.note_listener.class: Oro\Bundle\IssueBundle\EventListener\NoteListener
 
 services:
     oro_issue.validator.issue_parent_validator:
         class: %oro_issue.validator.issue_parent_validator.class%
         tags:
             - { name: validator.constraint_validator, alias: oro_issue.issue_parent_validator }
+
+    oro_issue.issue_listener:
+        class: %oro_issue.issue_listener.class%
+        arguments:
+            - @oro_security.security_facade.link
+        tags:
+            - { name: doctrine.event_listener, event: postPersist}
+            - { name: doctrine.event_listener, event: onFlush}
+
+    oro_issue.note_listener:
+        class: %oro_issue.note_listener.class%
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }

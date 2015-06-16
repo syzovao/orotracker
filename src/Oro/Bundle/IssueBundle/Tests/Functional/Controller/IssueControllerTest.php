@@ -141,7 +141,6 @@ class IssueControllerTest extends WebTestCase
         );
 
         $result = $this->getJsonResponseContent($response, 200);
-        $result = reset($result['data']);
 
         $response = $this->client->requestGrid(
             'issues-grid',

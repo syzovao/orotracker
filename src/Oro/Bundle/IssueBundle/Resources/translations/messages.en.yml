@@ -43,6 +43,9 @@ oro:
             subtask: Subtask
             bug:     Bug
 
+        workflow_issue_item.label: Workflow Issue Item
+        workflow_issue_step.label: Workflow Issue Step
+
         message:
             no_collaborators:
                 Collaborators not found.

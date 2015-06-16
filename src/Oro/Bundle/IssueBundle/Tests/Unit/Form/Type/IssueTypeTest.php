@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IssueBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\IssueBundle\Entity\Issue;
 use Oro\Bundle\IssueBundle\Form\Type\IssueType;
 
 
