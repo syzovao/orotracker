@@ -206,7 +206,7 @@ class Issue extends ExtendIssue implements Taggable
      * @ORM\OneToOne(targetEntity="Oro\Bundle\WorkflowBundle\Entity\WorkflowItem")
      * @ORM\JoinColumn(name="workflowItem_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    protected $workflowIssueItem;
+    protected $workflowItem;
 
     /**
      * @var WorkflowStep
@@ -214,7 +214,7 @@ class Issue extends ExtendIssue implements Taggable
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\WorkflowBundle\Entity\WorkflowStep")
      * @ORM\JoinColumn(name="workflowStep_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    protected $workflowIssueStep;
+    protected $workflowStep;
 
     /**
      * Constructor
@@ -607,7 +607,11 @@ class Issue extends ExtendIssue implements Taggable
      */
     public function hasChildren()
     {
-        return $this->children->count() == 0 ? false : true;
+        if ($this->children->count() > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -713,11 +717,12 @@ class Issue extends ExtendIssue implements Taggable
 
     /**
      * @param WorkflowItem $workflowItem
+     *
      * @return Issue
      */
     public function setWorkflowItem($workflowItem)
     {
-        $this->workflowIssueItem = $workflowItem;
+        $this->workflowItem = $workflowItem;
 
         return $this;
     }
@@ -727,16 +732,17 @@ class Issue extends ExtendIssue implements Taggable
      */
     public function getWorkflowItem()
     {
-        return $this->workflowIssueItem;
+        return $this->workflowItem;
     }
 
     /**
      * @param WorkflowItem $workflowStep
+     *
      * @return Issue
      */
     public function setWorkflowStep($workflowStep)
     {
-        $this->workflowIssueStep = $workflowStep;
+        $this->workflowStep = $workflowStep;
 
         return $this;
     }
@@ -746,6 +752,6 @@ class Issue extends ExtendIssue implements Taggable
      */
     public function getWorkflowStep()
     {
-        return $this->workflowIssueStep;
+        return $this->workflowStep;
     }
 }
