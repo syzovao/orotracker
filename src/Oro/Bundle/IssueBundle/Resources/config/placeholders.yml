@@ -1,0 +1,17 @@
+placeholders:
+    view_content_data_additional_information:
+        items:
+            oro_issue_user_grid: ~
+
+    view_navButtons_before:
+        items:
+            oro_issue_create_user_button: ~
+
+items:
+    oro_issue_user_grid:
+        template: OroIssueBundle:Issue:User/issues.html.twig
+        applicable: @oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)
+
+    oro_issue_create_user_button:
+        template: OroIssueBundle:Issue:User/createIssueButton.html.twig
+        applicable: @oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)

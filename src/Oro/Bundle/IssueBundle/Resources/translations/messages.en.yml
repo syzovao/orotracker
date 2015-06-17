@@ -6,6 +6,7 @@ oro:
         entity_label:         Issue
         assignee.label:       Assignee
         create:               Create
+        create_issue:         Create Issue
         subtask_label:        Sub-task
         subtask_plural_label: Sub-tasks
         list_label:           Issues List
@@ -43,12 +44,9 @@ oro:
             subtask: Subtask
             bug:     Bug
 
-        workflow_issue_item.label: Workflow Issue Item
-        workflow_issue_step.label: Workflow Issue Step
-
         message:
-            no_collaborators:
-                Collaborators not found.
+            no_collaborators: Collaborators not found.
+            issue_created: Issue created successfully.
 
         controller:
             issue.incorrect_parent: Only "Story" issues can have a Sub-tasks

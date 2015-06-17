@@ -1,0 +1,14 @@
+{% if resource_granted('oro_issue_view') %}
+
+    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
+    <div class="widget-content">
+        {% set scope = 'user-issues-' ~ entity.id %}
+        {{ dataGrid.renderGrid(
+        'user-issues-grid',
+        {id: entity.id}
+        ) }}
+    </div>
+
+{% endif %}
+

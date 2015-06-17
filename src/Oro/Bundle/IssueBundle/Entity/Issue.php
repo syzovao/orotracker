@@ -41,7 +41,14 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          },
  *          "security"={
  *              "type"="ACL",
+ *              "permissions"="All",
  *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "comment"={
+ *              "applicable"=true
  *          }
  *      }
  * )
