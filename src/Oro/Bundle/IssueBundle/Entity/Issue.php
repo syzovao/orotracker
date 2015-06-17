@@ -405,6 +405,16 @@ class Issue extends ExtendIssue implements Taggable
     }
 
     /**
+     * Remove collaborators
+     *
+     * @param User $user
+     */
+    public function removeCollaborator(User $user)
+    {
+        $this->collaborators->removeElement($user);
+    }
+
+    /**
      * @ORM\PrePersist
      */
     public function beforePersist()
