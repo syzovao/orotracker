@@ -4,6 +4,10 @@ namespace Oro\Bundle\IssueBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Form;
 
+use Oro\Bundle\IssueBundle\Entity\IssuePriority;
+use Oro\Bundle\IssueBundle\Entity\IssueResolution;
+use Oro\Bundle\IssueBundle\Entity\Issue;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -14,9 +18,13 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class IssueControllerTest extends WebTestCase
 {
     const ISSUE_CODE = 'TEST_ISSUE_1';
+    const ISSUE_CODE_UPDATED = 'TEST_ISSUE_1_Updated';
     const ISSUE_DESCRIPTION = 'Test Issue 1 Description';
     const ISSUE_SUMMARY = 'Test Summary 1';
     const USER_NAME = 'admin';
+
+    const ISSUE_CODE_STORY = 'TEST_STORY_1';
+    const ISSUE_CODE_SUBTASK = 'TEST_SUBTASK_1';
 
     protected $userId;
 
@@ -63,6 +71,69 @@ class IssueControllerTest extends WebTestCase
     }
 
     /**
+     * @return string
+     */
+    public function testCreateParent()
+    {
+        $userId = $this->getUserId();
+        // Create a new client to browse the application
+        $client = $this->client;
+        $crawler = $client->request('GET', $this->getUrl('oro_issue_create'));
+
+        /** @var Form $form */
+        $form = $crawler->selectButton('Save and Close')->form();
+        $form->setValues(array(
+            'oro_issue_form_issue[code]' => self::ISSUE_CODE_STORY,
+            'oro_issue_form_issue[summary]' => self::ISSUE_CODE_STORY,
+            'oro_issue_form_issue[description]' => self::ISSUE_CODE_STORY,
+            'oro_issue_form_issue[issueType]' => Issue::TYPE_STORY,
+            'oro_issue_form_issue[priority]' => IssuePriority::PRIORITY_TRIVIAL,
+            'oro_issue_form_issue[resolution]' => IssueResolution::RESOLUTION_UNRESOLVED,
+        ));
+        $form['oro_issue_form_issue[assignee]'] = $userId;
+        $client->followRedirects(true);
+        $crawler = $client->submit($form);
+
+        $result = $client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains("Issue has been saved", $crawler->html());
+
+        //Create Sub-task
+        $response = $this->client->requestGrid(
+            'issues-grid',
+            array('issues-grid[_filter][code][value]' => self::ISSUE_CODE_STORY)
+        );
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_issue_create', array('parent' => $result['id']))
+        );
+        $form = $crawler->selectButton('Save')->form();
+        $client->followRedirects(true);
+        /** @var Form $form */
+        $form = $crawler->selectButton('Save and Close')->form();
+        $form->setValues(array(
+            'oro_issue_form_issue[code]' => self::ISSUE_CODE_SUBTASK,
+            'oro_issue_form_issue[summary]' => self::ISSUE_CODE_SUBTASK,
+            'oro_issue_form_issue[description]' => self::ISSUE_CODE_SUBTASK,
+            'oro_issue_form_issue[issueType]' => Issue::TYPE_SUBTASK,
+            'oro_issue_form_issue[priority]' => IssuePriority::PRIORITY_TRIVIAL,
+            'oro_issue_form_issue[resolution]' => IssueResolution::RESOLUTION_UNRESOLVED,
+        ));
+        $form['oro_issue_form_issue[assignee]'] = $userId;
+
+        $client->followRedirects(true);
+        $crawler = $client->submit($form);
+
+        $result = $client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains("Issue has been saved", $crawler->html());
+        $this->assertContains(self::ISSUE_CODE_STORY, $crawler->html());
+    }
+
+    /**
      * @depends testCreate
      * @return string
      */
@@ -70,7 +141,7 @@ class IssueControllerTest extends WebTestCase
     {
         $response = $this->client->requestGrid(
             'issues-grid',
-            array('issues-grid[_filter][code][value]' => 'TEST_ISSUE_1')
+            array('issues-grid[_filter][code][value]' => self::ISSUE_CODE)
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -82,7 +153,7 @@ class IssueControllerTest extends WebTestCase
         );
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
-        $form['oro_issue_form_issue[code]'] = 'TEST_ISSUE_1_Updated';
+        $form['oro_issue_form_issue[code]'] = self::ISSUE_CODE_UPDATED;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
@@ -94,7 +165,7 @@ class IssueControllerTest extends WebTestCase
 
         $response = $this->client->requestGrid(
             'issues-grid',
-            array('issues-grid[_filter][code][value]' => 'TEST_ISSUE_1_Updated')
+            array('issues-grid[_filter][code][value]' => self::ISSUE_CODE_UPDATED)
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -133,11 +204,14 @@ class IssueControllerTest extends WebTestCase
         return $this->userId;
     }
 
+    /**
+     * @depends testUpdate
+     */
     public function testGridData()
     {
         $response = $this->client->requestGrid(
             'issues-grid',
-            array('issues-grid[_filter][code][value]' => 'TEST_ISSUE_1_Updated')
+            array('issues-grid[_filter][code][value]' => self::ISSUE_CODE_UPDATED)
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -155,6 +229,9 @@ class IssueControllerTest extends WebTestCase
         $this->assertEquals(self::ISSUE_SUMMARY, $result['summary']);
     }
 
+    /**
+     * @depends testUpdate
+     */
     public function testSearchData()
     {
         $searchStr = self::ISSUE_CODE;
@@ -170,5 +247,52 @@ class IssueControllerTest extends WebTestCase
 
         $this->assertContains($searchStr, $result->getContent());
         $this->assertContains('Search results', $result->getContent());
+    }
+
+    /**
+     * @depends testUpdate
+     */
+    public function testUserProfileIssueData()
+    {
+        $this->client->request('GET', $this->getUrl('oro_user_profile_view'));
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains("Create Issue", $result->getContent());
+
+        $response = $this->client->requestGrid(
+            'issues-grid',
+            array('issues-grid[_filter][code][value]' => self::ISSUE_CODE_UPDATED)
+        );
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+        $this->assertEquals(self::ISSUE_CODE_UPDATED, $result['code']);
+    }
+
+    /**
+     * @depends testView
+     */
+    public function testDelete()
+    {
+        $response = $this->client->requestGrid(
+            'issues-grid',
+            array('issues-grid[_filter][code][value]' => self::ISSUE_CODE_SUBTASK)
+        );
+
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+        $id = $result['id'];
+
+        $this->client->request(
+            'DELETE',
+            $this->getUrl('oro_api_delete_issue', array('id' => $id))
+        );
+
+        $result = $this->client->getResponse();
+        $this->assertEmptyResponseStatusCodeEquals($result, 204);
+
+        $this->client->request('GET', $this->getUrl('oro_issue_update', array('id' => $id)));
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 404);
     }
 }
