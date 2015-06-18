@@ -1,0 +1,28 @@
+connector:
+    name: oro_importexport
+    jobs:
+        issue_import_from_csv:
+            title: oro_issue.import_csv.title
+            type: import
+            steps:
+                import:
+                    title:     oro_issue.import_step.title
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_importexport.reader.csv
+                        processor: oro_importexport.processor.import_delegate
+                        writer:    oro_importexport.writer.entity
+                    parameters: ~
+
+        issue_export_csv:
+            title: oro_issue.export_csv.title
+            type:  export
+            steps:
+                export:
+                    title:     oro_issue.export_step.title
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_datagrid.importexport.export_connector
+                        processor: oro_importexport.processor.export_delegate
+                        writer:    oro_importexport.writer.csv
+                    parameters: ~

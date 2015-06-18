@@ -113,6 +113,9 @@ datagrid:
                 icon:          trash
                 link:          delete_link
                 rowAction:     true
+        options:
+            export:
+                csv: { label: oro.grid.export.csv }
 
     user-issues-grid:
         extends: issues-grid

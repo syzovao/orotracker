@@ -53,5 +53,11 @@ oro:
             issue.saved.message: Issue has been saved
             issue.deleted.message: Issue was deleted successfully
 
+        import_csv.title: Issues Import from CSV
+        import_step.title: Import Step
+
+        export_csv.title: Issues Export to CSV
+        export_step.title: Export Step
+
 issue:
     label: Issue
