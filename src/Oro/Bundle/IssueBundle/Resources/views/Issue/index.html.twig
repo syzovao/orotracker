@@ -9,5 +9,14 @@
             'path':          path('oro_issue_create'),
             'entity_label': 'oro.issue.entity_label'|trans
         }) }}
+
+        {% include 'OroImportExportBundle:ImportExport:buttons.html.twig' with {
+            entityClass: entity_class,
+            importProcessor: 'oro_issue.import_processor',
+            exportProcessor: 'oro_issue',
+            importTitle: 'oro.importexport.import.entity'|trans({'%entityName%': 'oro.issue.entity_plural_label'|trans}),
+            dataGridName: gridName
+        } %}
+
     {% endif %}
 {% endblock %}

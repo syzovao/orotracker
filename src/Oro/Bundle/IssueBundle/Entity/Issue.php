@@ -14,6 +14,7 @@ use Oro\Bundle\IssueBundle\Model\ExtendIssue;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 
 /**
@@ -142,7 +143,14 @@ class Issue extends ExtendIssue implements Taggable
      * @ORM\JoinTable(name="oro_issue_collaborators",
      *      joinColumns={@ORM\JoinColumn(name="issue_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")}
-     *      )
+     * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      **/
     protected $collaborators;
 
@@ -199,6 +207,13 @@ class Issue extends ExtendIssue implements Taggable
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $organization;
 
@@ -241,6 +256,18 @@ class Issue extends ExtendIssue implements Taggable
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return mixed
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     /**
@@ -427,7 +454,6 @@ class Issue extends ExtendIssue implements Taggable
     public function beforePersist()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->addCollaborator($this->getReporter());
     }
 
     /**

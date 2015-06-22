@@ -1,0 +1,65 @@
+parameters:
+    oro_issue.importexport.normalizer.issue.class: Oro\Bundle\IssueBundle\ImportExport\Serializer\Normalizer\IssueNormalizer
+    oro_issue.importexport.provider.issue_max_data.class: Oro\Bundle\IssueBundle\ImportExport\Provider\IssueMaxDataProvider
+    oro_issue.importexport.provider.issue_header.class: Oro\Bundle\IssueBundle\ImportExport\Provider\IssueHeaderProvider
+    oro_issue.importexport.data_converter.issue.class: Oro\Bundle\IssueBundle\ImportExport\Converter\IssueDataConverter
+    oro_issue.importexport.strategy.import.issue.helper.class: Oro\Bundle\IssueBundle\ImportExport\Strategy\Import\IssueImportStrategyHelper
+    oro_issue.importexport.strategy.import.issue.add_or_replace.class: Oro\Bundle\IssueBundle\ImportExport\Strategy\Import\AddOrReplaceStrategy
+
+services:
+    # Normalizers
+    oro_issue.importexport.normalizer.issue:
+        class: %oro_issue.importexport.normalizer.issue.class%
+        tags:
+            - { name: oro_importexport.normalizer }
+
+    # Providers
+    oro_issue.importexport.provider.issue_header:
+        class: %oro_issue.importexport.provider.issue_header.class%
+        arguments:
+            - @oro_importexport.serializer
+            - @oro_importexport.data_converter.default
+            - @oro_issue.importexport.provider.issue_max_data
+
+    oro_issue.importexport.provider.issue_max_data:
+        class: %oro_issue.importexport.provider.issue_max_data.class%
+        arguments:
+            - @doctrine
+
+    # Converter
+    oro_issue.importexport.data_converter.issue:
+        class: %oro_issue.importexport.data_converter.issue.class%
+        arguments:
+            - @oro_issue.importexport.provider.issue_header
+
+    # Strategy
+    oro_issue.importexport.strategy.import.issue.add_or_replace:
+        class: %oro_issue.importexport.strategy.import.issue.add_or_replace.class%
+        arguments:
+            - @oro_importexport.strategy.import.helper
+            - @oro_issue.importexport.strategy.import.issue.helper
+            - @translator
+
+    oro_issue.importexport.strategy.import.issue.helper:
+        class: %oro_issue.importexport.strategy.import.issue.helper.class%
+        arguments:
+            - @security.context
+            - @doctrine
+
+    # Import processor
+    oro_issue.importexport.processor.import:
+        parent: oro_importexport.processor.import_abstract
+        calls:
+             - [setDataConverter, [@oro_issue.importexport.data_converter.issue]]
+             - [setStrategy, [@oro_issue.importexport.strategy.import.issue.add_or_replace]]
+        tags:
+            - { name: oro_importexport.processor, type: import, entity: %oro_issue.issue.entity.class%, alias: oro_issue.add_or_replace }
+            - { name: oro_importexport.processor, type: import_validation, entity: %oro_issue.issue.entity.class%, alias: oro_issue.add_or_replace }
+
+    # Export processor
+    oro_issue.importexport.processor.export:
+        parent: oro_importexport.processor.export_abstract
+        calls:
+             - [setDataConverter, [@oro_issue.importexport.data_converter.issue]]
+        tags:
+            - { name: oro_importexport.processor, type: export, entity: %oro_issue.issue.entity.class%, alias: oro_issue }

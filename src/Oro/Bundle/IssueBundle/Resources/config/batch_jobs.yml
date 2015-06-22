@@ -10,7 +10,7 @@ connector:
                     class:     Oro\Bundle\BatchBundle\Step\ItemStep
                     services:
                         reader:    oro_importexport.reader.csv
-                        processor: oro_importexport.processor.import_delegate
+                        processor: oro_issue.importexport.processor.import
                         writer:    oro_importexport.writer.entity
                     parameters: ~
 
@@ -23,6 +23,6 @@ connector:
                     class:     Oro\Bundle\BatchBundle\Step\ItemStep
                     services:
                         reader:    oro_datagrid.importexport.export_connector
-                        processor: oro_importexport.processor.export_delegate
+                        processor: oro_issue.importexport.processor.export
                         writer:    oro_importexport.writer.csv
                     parameters: ~

@@ -49,7 +49,10 @@ class IssueListener
         $entity->addCollaborator($user);
 
         //add assignee as collaborator
-        $entity->addCollaborator($entity->getAssignee());
+        $assignee = $entity->getAssignee();
+        if ($assignee instanceof User) {
+            $entity->addCollaborator($assignee);
+        }
     }
 
     /**
@@ -71,7 +74,10 @@ class IssueListener
                 continue;
             }
 
-            $entity->addCollaborator($entity->getAssignee());
+            $assignee = $entity->getAssignee();
+            if($assignee instanceof User) {
+                $entity->addCollaborator($assignee);
+            }
             $meta = $this->getClassMetadata($entity, $entityManager);
             $unitOfWork->computeChangeSet($meta, $entity);
         }
